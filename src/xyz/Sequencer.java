@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import xyz.proc.Process;
 import xyz.proc.Status;
 
-public class Sequencer {
-    Sequencer (Simulation parent) { this.parent = parent; }
+public class Sequencer extends SimulationElement {
+    Sequencer (Simulation parent) { super(parent); }
 
     public void setup(ArrayList<Process> procs) { this.allProcesses = procs; }
     private Simulation parent;

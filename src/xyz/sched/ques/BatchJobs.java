@@ -3,7 +3,6 @@ package xyz.sched.ques;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.concurrent.Semaphore;
 
 import xyz.proc.Process;
 import xyz.sched.Scheduler;
@@ -11,25 +10,27 @@ import xyz.sched.Scheduler;
 public class BatchJobs extends ProcessQueue {
     public BatchJobs (Scheduler parent, int num) {
         super(parent);
-        this.num = num;
+        this.batchCtr = num;
         queue = new LinkedList<>();
     }
-    private int num;
+    private int batchCtr;
 
     public boolean step() {
         if (queue.isEmpty()) return false;
-        if (num != 0) {
+        if (batchCtr != 0) {
             return true;
         }
         return false;
     }
     public Process getJob() {
-        assert num != 0;
-        if (num > 0) num --;
-        return queue.pop();
+        assert batchCtr!= 0;
+        if (batchCtr > 0) batchCtr -- ;
+        Process p = queue.pop();
+        p.remainingTime = p.serviceTime;
+        return p;
     }
     public void releaseJob() {
-        if (num >= 0) num ++;
+        if (batchCtr>= 0) batchCtr ++;
     }
     public void incrementWait() {
         for (Process p : queue)

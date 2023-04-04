@@ -8,8 +8,8 @@ import xyz.sched.ques.BlockedQueue;
 import xyz.sched.ques.ReadyQueue;
 
 public class ShortestJobFirst extends Scheduler {
-    public ShortestJobFirst(Simulation parent, int batchSize) {
-        super(parent, batchSize);
+    public ShortestJobFirst(Simulation parent) {
+        super(parent);
         activeJob = new ActiveJob(this);
         blockedQueue = new BlockedQueue(this);
         readyQueue = new ReadyQueue(this, 0);

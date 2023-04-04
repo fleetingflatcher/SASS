@@ -7,15 +7,84 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.opencsv.CSVWriter;
+import xyz.Simulation;
+import xyz.SimulationElement;
 import xyz.proc.Process;
+import xyz.sched.SchedulerType;
 import xyz.scrb.Figures;
 
-public class Exporter {
-    public Exporter() {
+public class Exporter extends SimulationElement {
+    public Exporter(Simulation parent) {
+        super(parent);
         exportList = new ArrayList<>();
     }
     private ArrayList<Table> exportList;
+    public Table addSettingsToExport () {
+        ArrayList<Object> schedulerSettingsHeadArr = new ArrayList<>();
+        ArrayList<Object> schedulerSettingsArr = new ArrayList<>();
 
+        ArrayList<Object> generatorSettingsHeadArr = new ArrayList<>();
+        ArrayList<Object> generatorSettingsArr = new ArrayList<>();
+
+        ArrayList<Object> iohandlerSettingsHeadArr = new ArrayList<>();
+        ArrayList<Object> ioHandlerSettingsArr = new ArrayList<>();
+
+        schedulerSettingsHeadArr.add("Type:");
+        schedulerSettingsArr.add(parent.SIM_SETTINGS.SCH.TYPE);
+        schedulerSettingsHeadArr.add("Batch Size:");
+        schedulerSettingsArr.add(parent.SIM_SETTINGS.SCH.BATCH_SIZE);
+        schedulerSettingsHeadArr.add("Time Slice:");
+        schedulerSettingsArr.add(parent.SIM_SETTINGS.SCH.TIME_SLICE);
+        if (parent.SIM_SETTINGS.SCH.TYPE == SchedulerType.UNIX) {
+            schedulerSettingsHeadArr.add("Num Priority:");
+            schedulerSettingsArr.add(parent.SIM_SETTINGS.SCH.UNIX_PRIORITY_LEVELS);
+        }
+
+        generatorSettingsHeadArr.add("Is random?");
+        generatorSettingsArr.add(parent.SIM_SETTINGS.GEN.RANDOM_INPUT);
+        if (parent.SIM_SETTINGS.GEN.RANDOM_INPUT) {
+            generatorSettingsHeadArr.add("Random Seed:");
+            generatorSettingsArr.add(parent.SIM_SETTINGS.GEN.RANDOM_SEED);
+            generatorSettingsHeadArr.add("Stimulus Duration:");
+            generatorSettingsArr.add(parent.SIM_SETTINGS.GEN.STIMULUS_DURATION);
+            generatorSettingsHeadArr.add("Max arrival time:");
+            generatorSettingsArr.add(parent.SIM_SETTINGS.GEN.MAX_ARRIVAL_TIME);
+            generatorSettingsHeadArr.add("Max service time:");
+            generatorSettingsArr.add(parent.SIM_SETTINGS.GEN.MAX_SERVICE_TIME);
+            generatorSettingsHeadArr.add("Number of processes:");
+            generatorSettingsArr.add(parent.SIM_SETTINGS.GEN.NUM_PROCESSES);
+
+        }
+
+        iohandlerSettingsHeadArr.add("Number of Peripherals:");
+        ioHandlerSettingsArr.add(parent.SIM_SETTINGS.IOH.NUM_PERIFS);
+        iohandlerSettingsHeadArr.add("Maximum IO time:");
+        ioHandlerSettingsArr.add(parent.SIM_SETTINGS.IOH.MAX_IO_TIME);
+        iohandlerSettingsHeadArr.add("Maximum # IO Calls per process:");
+        ioHandlerSettingsArr.add(parent.SIM_SETTINGS.IOH.MAX_NUM_IOC_PER_PROCESS);
+        iohandlerSettingsHeadArr.add("Proportion of IO processes:");
+        ioHandlerSettingsArr.add(parent.SIM_SETTINGS.IOH.PROPORTION);
+
+        Column schedulerHeadCol = new Column("Scheduler Settings", schedulerSettingsHeadArr);
+        Column schedulerCol = new Column("", schedulerSettingsArr);
+        Column generatorHeadCol = new Column("Generator Settings", generatorSettingsHeadArr);
+        Column generatorCol = new Column("", generatorSettingsArr);
+        Column iohandlerHeadCol = new Column("IOHandler Settings", iohandlerSettingsHeadArr);
+        Column iohandlerCol = new Column("", ioHandlerSettingsArr);
+
+        Table table = new Table();
+        table.addColumn(new Column("Simulation Settings", new ArrayList<>()));
+        table.addColumn(schedulerHeadCol);
+        table.addColumn(schedulerCol);
+        table.addColumn(new Column("", new ArrayList<>()));
+        table.addColumn(generatorHeadCol);
+        table.addColumn(generatorCol);
+        table.addColumn(new Column("", new ArrayList<>()));
+        table.addColumn(iohandlerHeadCol);
+        table.addColumn(iohandlerCol);
+        exportList.add(table);
+        return table;
+    }
     public Table addFiguresToExport (int time, boolean isFinished, Figures figures) {
 
         ArrayList<Object> genDataHeadersArr = new ArrayList<>();

@@ -1,6 +1,7 @@
 package xyz.seqsrc;
 
 import xyz.Simulation;
+import xyz.SimulationElement;
 import xyz.perif.Peripheral;
 import xyz.proc.IOCall;
 import xyz.proc.Process;
@@ -11,18 +12,12 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.ArrayList;
 
-public class Generator {
+public class Generator extends SimulationElement {
     public Generator (Simulation parent) {
-        this.parent = parent;
+        super(parent);
         rand = new Random(0);
     }
-    public void updateRandomSeed() {
-        rand.setSeed(parent.SIM_SETTINGS.GENERATOR_RAND_SEED());
-    }
-    private Simulation parent;
-
     Random rand;
-
     public ArrayList<Peripheral> generatePeripherals (int num) {
         ArrayList<Peripheral> result = new ArrayList<>();
         for (int i = 0; i < num; ++i)
@@ -42,15 +37,14 @@ public class Generator {
 
     private Process newProcess () {
         Process p = new Process();
-        p.arrivalTime = Math.abs(rand.nextInt()) % parent.SIM_SETTINGS.MAX_ARRIVAL_TIME();
-        p.remainingTime = 1 + Math.abs(rand.nextInt()) % parent.SIM_SETTINGS.MAX_SERVICE_TIME();
-        p.serviceTime = p.remainingTime;
+        p.arrivalTime = Math.abs(rand.nextInt()) % parent.SIM_SETTINGS.GEN.MAX_ARRIVAL_TIME;
+        p.serviceTime = 1 + Math.abs(rand.nextInt()) % parent.SIM_SETTINGS.GEN.MAX_SERVICE_TIME;
         float factor = (rand.nextBoolean() ? 1 : -1) * (rand.nextFloat() / 2f);
         p.expectedServiceTime = (int)((1 + ( rand.nextBoolean() ? factor : factor * -1 )) * p.remainingTime);
         p.hasIO = false;
-        if (rand.nextFloat() < parent.SIM_SETTINGS.IOC_PROPORTION()) {
+        if (rand.nextFloat() < parent.SIM_SETTINGS.IOH.PROPORTION) {
 
-            int numIOCs = 1 + Math.abs(rand.nextInt()) % parent.SIM_SETTINGS.MAX_NUM_IOCS();
+            int numIOCs = 1 + Math.abs(rand.nextInt()) % parent.SIM_SETTINGS.IOH.MAX_NUM_IOC_PER_PROCESS;
             ArrayList<IOCall> arr = new ArrayList<>();
             for (int i = 0; i < numIOCs; ++i) {
                 arr.add(newIOCall(p));
@@ -72,8 +66,8 @@ public class Generator {
     private IOCall newIOCall (Process p) {
         IOCall ioc = new IOCall(p) ;
 
-        ioc.start = Math.abs(rand.nextInt()) % p.remainingTime;
-        ioc.duration = 1 + Math.abs(rand.nextInt()) % (parent.SIM_SETTINGS.MAX_PERIF_TIME() - 1);
+        ioc.start = Math.abs(rand.nextInt()) % p.serviceTime;
+        ioc.duration = 1 + Math.abs(rand.nextInt()) % (parent.SIM_SETTINGS.IOH.MAX_IO_TIME - 1);
         ioc.remaining = ioc.duration;
         int numPerifs = 1 + Math.abs(rand.nextInt()) % parent.ioHandler.perifs.size()/2;
         ioc.perifs = new ArrayList<>();

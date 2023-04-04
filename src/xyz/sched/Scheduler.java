@@ -2,6 +2,7 @@ package xyz.sched;
 
 
 import xyz.Simulation;
+import xyz.SimulationElement;
 import xyz.proc.IOCall;
 import xyz.proc.Process;
 import xyz.proc.Status;
@@ -12,12 +13,11 @@ import xyz.sched.ques.ReadyQueue;
 
 import java.util.ArrayList;
 
-public abstract class Scheduler {
-    public Scheduler(Simulation parent, int batchSize) {
-        this.parent = parent;
-        batchJobs = new BatchJobs(this, batchSize);
+public abstract class Scheduler extends SimulationElement {
+    public Scheduler(Simulation parent) {
+        super(parent);
+        batchJobs = new BatchJobs(this, parent.SIM_SETTINGS.SCH.BATCH_SIZE);
     }
-    protected final Simulation parent;
     public BatchJobs batchJobs;
     public ActiveJob activeJob;
     public BlockedQueue blockedQueue;
@@ -56,6 +56,13 @@ public abstract class Scheduler {
             readyProcess(batchJobs.getJob());
 
         /*
+            Ready Queue
+         */
+        if (readyQueue.step()) {
+            activateProcess();
+        }
+
+        /*
             Active Job
          */
         if(activeJob.step()) {
@@ -73,6 +80,7 @@ public abstract class Scheduler {
                 }
             }
         }
+
         /*
             Blocked Queue
          */
@@ -80,14 +88,6 @@ public abstract class Scheduler {
             for (Process p : blockedQueue.ejectUnblocked()) {
                 readyProcess(p);
             }
-
-
-        /*
-            Ready Queue
-         */
-        if (readyQueue.step()) {
-            activateProcess();
-        }
         
         incrementWaitTimes();
     }

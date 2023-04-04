@@ -1,16 +1,15 @@
 package xyz;
 
 import xyz.exporter.Exporter;
-import xyz.sched.UNIX;
+import xyz.sched.*;
 import xyz.seqsrc.Dataset;
 import xyz.seqsrc.Generator;
 import xyz.seqsrc.Importer;
 import xyz.proc.Process;
 import xyz.proc.IOCall;
-import xyz.sched.HighestResponseRatioNext;
-import xyz.sched.Scheduler;
 import xyz.scrb.Figures;
 import xyz.scrb.Scoreboard;
+import xyz.settings.SimulationSettings;
 
 import java.util.ArrayList;
 
@@ -28,23 +27,39 @@ public class Simulation {
 
     public Simulation ()
     {
-        SIM_SETTINGS = new SimulationSettings();
-        this.generator = new Generator(this);
         this.importer = new Importer(this);
+        SIM_SETTINGS = importer.importSettings();
+
+        this.generator = new Generator(this);
         this.sequencer = new Sequencer(this);
         this.ioHandler = new IOHandler(this);
-        // INSERT DECISION TREE FOR SCHEDULING ALGORITHM HERE
-        this.scheduler = new UNIX(this, SIM_SETTINGS.BATCH_SIZE(), SIM_SETTINGS.TIME_SLICE(), 2);
-        this.scoreboard = new Scoreboard(this);
-        this.exporter = new Exporter();
-        time = 0;
-    }
-    public void setup () {
-        ArrayList<Process> allProcesses = new ArrayList<>();
+        switch (SIM_SETTINGS.SCH.TYPE) {
+            case FirstComeFirstServed:
+                this.scheduler = new FirstComeFirstServed(this);
+                break;
+            case ShortestJobFirst:
+                this.scheduler = new ShortestJobFirst(this);
+                break;
+            case ShortestRemainingTime:
+                this.scheduler = new ShortestRemainingTime(this, SIM_SETTINGS.SCH.TIME_SLICE);
+                break;
+            case RoundRobin:
+                this.scheduler = new RoundRobin(this, SIM_SETTINGS.SCH.TIME_SLICE);
+                break;
+            case HighestResponseRatioNext:
+                this.scheduler = new HighestResponseRatioNext(this);
+            case UNIX:
+                this.scheduler = new UNIX(this, SIM_SETTINGS.SCH.TIME_SLICE, SIM_SETTINGS.SCH.UNIX_PRIORITY_LEVELS);
+                break;
+        }
 
-        if (SIM_SETTINGS.RANDOM_INPUT()) {
-            ioHandler.setup(generator.generatePeripherals(SIM_SETTINGS.NUM_PERIFS()));
-            allProcesses = generator.generateProcesses(SIM_SETTINGS.NUM_PROCESSES());
+        this.scoreboard = new Scoreboard(this);
+        this.exporter = new Exporter(this);
+
+        ArrayList<Process> allProcesses;
+        if (SIM_SETTINGS.GEN.RANDOM_INPUT) {
+            ioHandler.setup(generator.generatePeripherals(SIM_SETTINGS.IOH.NUM_PERIFS));
+            allProcesses = generator.generateProcesses(SIM_SETTINGS.GEN.NUM_PROCESSES);
         }
         else {
             Dataset d = importer.importDataset();
@@ -53,6 +68,9 @@ public class Simulation {
         }
         sequencer.setup(allProcesses);
         scoreboard.setup(allProcesses);
+        time = 0;
+
+        exporter.addSettingsToExport();
     }
     void run ()
     {
@@ -76,8 +94,9 @@ public class Simulation {
             }
             ioHandler.step();
 
-            if (time % 5000 == 0) {
-                addFigs();
+            if (time % SIM_SETTINGS.OUT.FREQUENCY == 0 && time > 0) {
+                if (SIM_SETTINGS.OUT.PROCESS_TABLE) addTable();
+                else addFigs();
             }
             time++;
         }

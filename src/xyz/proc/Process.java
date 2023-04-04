@@ -14,7 +14,6 @@ public class Process implements Comparable<Process> {
         timeInBatchQueue = 0;
         seenByCPU = false;
         UNIX_utilization = 0;
-        UNIX_priority = basePriority;
     }
     private static int COUNT = 0;
 
@@ -32,8 +31,6 @@ public class Process implements Comparable<Process> {
     public int remainingTime;
     public int expectedServiceTime;
     public float UNIX_utilization;
-    public float UNIX_priority;
-
     public int waitTime() { return timeInBatchQueue + timeInReadyQueue + timeInBlockedQueue; }
     public float responseRatio() { return ((float)(waitTime() + expectedServiceTime)) / expectedServiceTime; }
 

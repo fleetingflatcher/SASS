@@ -8,8 +8,8 @@ import xyz.sched.ques.BlockedQueue;
 import xyz.sched.ques.ReadyQueue;
 
 public class HighestResponseRatioNext extends Scheduler {
-    public HighestResponseRatioNext(Simulation parent, int batchSize) {
-        super(parent, batchSize);
+    public HighestResponseRatioNext(Simulation parent) {
+        super(parent);
         activeJob = new ActiveJob(this);
         blockedQueue = new BlockedQueue(this);
         readyQueue = new ReadyQueue(this, 0);

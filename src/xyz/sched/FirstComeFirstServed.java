@@ -7,8 +7,8 @@ import xyz.sched.ques.*;
 
 
 public class FirstComeFirstServed extends Scheduler {
-    public FirstComeFirstServed(Simulation parent, int batchSize) {
-        super(parent, batchSize);
+    public FirstComeFirstServed(Simulation parent) {
+        super(parent);
         activeJob = new ActiveJob(this);
         blockedQueue = new BlockedQueue(this);
         readyQueue = new ReadyQueue(this, 0);

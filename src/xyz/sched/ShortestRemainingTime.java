@@ -8,8 +8,8 @@ import xyz.sched.ques.BlockedQueue;
 import xyz.sched.ques.ReadyQueue;
 
 public class ShortestRemainingTime extends Scheduler {
-    public ShortestRemainingTime (Simulation parent, int batchSize, int timeSlice) {
-        super(parent, batchSize);
+    public ShortestRemainingTime (Simulation parent, int timeSlice) {
+        super(parent);
         activeJob = new ActiveJob(this);
         blockedQueue = new BlockedQueue(this);
         readyQueue = new ReadyQueue(this, 0);

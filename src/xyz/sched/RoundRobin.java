@@ -9,8 +9,8 @@ import xyz.sched.ques.ReadyQueue;
 
 public class RoundRobin extends Scheduler {
 
-    public RoundRobin (Simulation parent, int batchSize, int timeSlice) {
-        super(parent, batchSize);
+    public RoundRobin (Simulation parent, int timeSlice) {
+        super(parent);
         activeJob = new ActiveJob(this);
         blockedQueue = new BlockedQueue(this);
         readyQueue = new ReadyQueue(this, 0);

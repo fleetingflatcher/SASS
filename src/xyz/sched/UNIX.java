@@ -10,8 +10,8 @@ import xyz.sched.ques.ReadyQueue;
 import java.util.ArrayList;
 
 public class UNIX extends Scheduler {
-    public UNIX (Simulation parent, int batchSize, int timeSlice, int numPriorityLevels) {
-        super(parent, batchSize);
+    public UNIX (Simulation parent, int timeSlice, int numPriorityLevels) {
+        super(parent);
         activeJob = new ActiveJob(this);
         blockedQueue = new BlockedQueue(this);
         readyQueue = new ReadyQueue(this, 0);
@@ -60,9 +60,10 @@ public class UNIX extends Scheduler {
     @Override
     public void readyProcess(Process p) {
         p.setStatus(Status.READY);
-        p.UNIX_priority = p.basePriority + p.UNIX_utilization / 2;
+        float priority = p.basePriority + p.UNIX_utilization / 2;
         int numPriorityLevels = readyQueues.size();
-        int dest = (int)(p.UNIX_priority * (numPriorityLevels) / 500);
+        int dest = (int)(priority * (numPriorityLevels) / 500);
+        if (dest > numPriorityLevels) dest = numPriorityLevels;
         readyQueues.get(dest).push(p);
     }
 }

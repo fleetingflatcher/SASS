@@ -2,7 +2,6 @@ package xyz.sched.ques;
 
 import xyz.proc.Process;
 import xyz.proc.Status;
-import xyz.sched.RoundRobin;
 import xyz.sched.Scheduler;
 
 import java.util.LinkedList;
@@ -52,9 +51,10 @@ public class ActiveJob extends AbstractProcessQueue {
                 preemptJob();
                 return true;
             }
-            peekProcess().remainingTime-- ;
+            peekProcess().remainingTime -- ;
             peekProcess().runTime ++ ;
             peekProcess().UNIX_utilization ++ ;
+            timeOnCurrentJob ++ ;
         }
         return false;
     }

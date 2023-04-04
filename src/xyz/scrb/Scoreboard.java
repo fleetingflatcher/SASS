@@ -1,17 +1,17 @@
 package xyz.scrb;
 
 import xyz.Simulation;
+import xyz.SimulationElement;
 import xyz.proc.Status;
 import xyz.scrb.Figures;
 
 import java.util.ArrayList;
 import xyz.proc.Process;
 
-public class Scoreboard {
+public class Scoreboard extends SimulationElement {
     public Scoreboard (Simulation parent) {
-        this.parent = parent;
+        super(parent);
     }
-    private Simulation parent;
     public void setup(ArrayList<Process> procs) {
         this.allProcesses = procs;
     }

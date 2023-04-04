@@ -6,16 +6,15 @@ import xyz.proc.IOCall;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class IOHandler {
+public class IOHandler extends SimulationElement{
     public IOHandler (Simulation parent) {
-        this.parent = parent;
+        super(parent);
         this.perifs = null;
         this.runningIOCalls = new ArrayList<>();
     }
     public void setup(ArrayList<Peripheral> allPeripherals) {
         this.perifs = allPeripherals;
     }
-    private Simulation parent;
     public ArrayList<Peripheral> perifs;
     public ArrayList<IOCall> runningIOCalls;
 
