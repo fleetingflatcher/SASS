@@ -1,0 +1,1 @@
+java -classpath ".\bin;.\lib\opencsv-5.7.1.jar" xyz.Test

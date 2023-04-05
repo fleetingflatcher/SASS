@@ -19,7 +19,8 @@ import java.util.LinkedList;
 public class Importer extends SimulationElement {
     public Importer(Simulation parent) { super(parent); }
 
-    String defaultFileName = "ex_inputData.ini";
+    String defaultFileName = ".\\custom_input\\inputData.ini";
+    String customFileName = null;
     String settingsFileName = "settings.ini";
 
     public SimulationSettings importSettings ()
@@ -33,6 +34,13 @@ public class Importer extends SimulationElement {
                 if (line.startsWith("~")) continue;
                 String[] tokens = line.split(" ");
                 switch (tokens[0]) {
+                    case "source" -> {
+                        String s = new String();
+                        s = s.concat(".\\custom_input\\");
+                        s = s.concat(tokens[1]);
+                        customFileName = s;
+                    }
+
                     case "type" -> {
                         switch (tokens[1]) {
                             case "FirstComeFirstServed": settings.SCH.TYPE = SchedulerType.FirstComeFirstServed; break;
@@ -69,7 +77,7 @@ public class Importer extends SimulationElement {
     }
 
     public Dataset importDataset() {
-        return importDataset(defaultFileName);
+        return customFileName == null ? importDataset(defaultFileName) : importDataset(customFileName);
     }
 
     public Dataset importDataset(String fileName)

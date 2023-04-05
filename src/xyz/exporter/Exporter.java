@@ -272,20 +272,30 @@ public class Exporter extends SimulationElement {
         int minute = ldt.getMinute();
         int second = ldt.getSecond();
 
+        // Trim package names.
+        tag = tag.substring(10);
+
+        // Begin compiling file name & location.
         StringBuilder sb = new StringBuilder();
+        sb.append(".\\data\\");
         sb.append(tag);
         sb.append('_');
-        sb.append(day);
         sb.append(month);
+        sb.append('-');
+        sb.append(day);
+        sb.append('-');
         sb.append(year);
         sb.append('_');
         sb.append(hour);
+        sb.append('-');
         sb.append(minute);
+        sb.append('-');
         sb.append(second);
         sb.append(".csv");
         return sb.toString();
     }
     public void exportToCSV(String tag) {
+
         String fileName = prepareFilename(tag);
         String[][] data = prepareExportStringMatrix();
         try

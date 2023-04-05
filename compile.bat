@@ -1,0 +1,1 @@
+javac -cp lib/opencsv-5.7.1.jar -sourcepath ./src/ -d ./bin/ ./src/xyz/Test.java
